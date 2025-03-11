@@ -23,6 +23,10 @@ export const getAccounts = async ({ userId }: getAccountsProps) => {
     // get banks from db
     const banks = await getBanks({ userId });
 
+    console.log("banks", banks);
+
+    if (!banks || banks.length === 0) throw new Error("No banks found");
+
     const accounts = await Promise.all(
       banks?.map(async (bank: Bank) => {
         // get each account info from plaid
@@ -30,7 +34,7 @@ export const getAccounts = async ({ userId }: getAccountsProps) => {
           access_token: bank.accessToken,
         });
 
-        console.log("Accounts Response:", accountsResponse.data.accounts);
+        console.log("Accounts Response:", accountsResponse.data);
 
         const accountData = accountsResponse.data.accounts[0];
         // get institution info from plaid
@@ -80,21 +84,21 @@ export const getAccount = async ({ appwriteItemId }: getAccountProps) => {
     const accountData = accountsResponse.data.accounts[0];
 
     // get transfer transactions from appwrite
-   // const transferTransactionsData = await getTransactionsByBankId({
-     // bankId: bank.$id,
-  //  });
+    // const transferTransactionsData = await getTransactionsByBankId({
+    // bankId: bank.$id,
+    //  });
 
-  //  const transferTransactions = transferTransactionsData.documents.map(
+    //  const transferTransactions = transferTransactionsData.documents.map(
     //  (transferData: Transaction) => ({
     //    id: transferData.$id,
     //    name: transferData.name!,
     //    amount: transferData.amount!,
-   //     date: transferData.$createdAt,
+    //     date: transferData.$createdAt,
     //    paymentChannel: transferData.channel,
     //    category: transferData.category,
     //    type: transferData.senderBankId === bank.$id ? "debit" : "credit",
-   //   })
- //   );
+    //   })
+    //   );
 
     // get institution info from plaid
     const institution = await getInstitution({
@@ -146,7 +150,7 @@ export const getInstitution = async ({
 
     return parseStringify(intitution);
   } catch (error) {
-    console.error("An error occurred while getting the accounts:", error);
+    console.error("An error occurred while getting the institutions:", error);
   }
 };
 
